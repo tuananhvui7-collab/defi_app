@@ -1,5 +1,38 @@
 # Báo cáo kiểm chứng thực tế
 
+## Cập nhật hỗ trợ Windows native / PowerShell
+
+Thời điểm: 2026-10-20T21:02:10+07:00 (giờ Việt Nam).
+
+README hiện hướng dẫn **Windows 10/11 x64, Python 3.12, Node 24, Geth 1.14.13 Windows amd64**.
+Không cần Linux/WSL/Docker/Go để làm theo quy trình Windows. Người dùng tải và giải nén binary Geth chính thức;
+installer nhận `-GethPath`, kiểm tra phiên bản rồi lưu đường dẫn local. Không dùng `/workspace` trong các entry point Windows.
+
+Đã thực hiện:
+
+- Kiểm tra cú pháp toàn bộ 5 script `.ps1` bằng parser PowerShell 7.4.6.
+- Kiểm tra native argument có dấu cách và nonzero exit: helper giữ nguyên argument và dừng đúng khi lệnh ngoài trả exit 17.
+- Chạy `install.ps1 -GethPath ...` bằng PowerShell 7.4.6 trên Linux: pip, npm ci, compile và 4 unit tests thành công.
+- Chạy `start_geth.ps1`: khởi động Geth local thật, RPC loopback chain 1337.
+- Chạy `demo.ps1`: swap một pool, ba pool, route và flash loan thành công.
+- Chạy `verify_local.ps1`: **14 passed, 0 failed, 0 errors, 0 skipped**, thời gian 14.940 giây; xác nhận khôi phục biến RUN_INTEGRATION sau khi test.
+- Tải thành công 47 wheels cho target CPython 3.12 Windows x64 / pure Python, gồm 45 package pin ban đầu và hai dependency Windows được bổ sung: `pywin32==311`, `colorama==0.4.6`.
+
+**Chưa chạy trên Windows thật, chưa kiểm chứng Windows PowerShell 5.1 hoặc geth.exe.**
+Chạy PowerShell 7 trên Linux và tải được Windows wheels không thay thế kiểm thử đầu-cuối trên Windows.
+Script dùng cú pháp tương thích PowerShell 5.1, `py.exe -3.12`, `npm.cmd` và `.venv/Scripts/python.exe` khi ở Windows;
+nhánh này vẫn cần được xác minh trên máy Windows của người dùng.
+
+Máy cloud đã được khởi tạo lại trong phiên làm việc này: manifest cũ tồn tại nhưng bytecode cũ không có trên chain đang chạy.
+CLI phát hiện và từ chối demo đúng cách; đã lưu bản sao manifest cũ trong `.local/` rồi deploy lại cả hai protocol để kiểm chứng tiếp.
+Deployment mới: Aave Pool `0xBA137c60532E56cf8Bf119A83a51346D96389eE4`, receiver `0x3c81041669B5EB2413Bdbd0C2e692CfBE53b519b`.
+Bằng chứng mới: `.local/install-powershell.log`, `geth-powershell.log`, `powershell-validation.log`, `test-results.xml`.
+Không khẳng định snapshot cloud đã khôi phục đầy đủ trạng thái blockchain cũ.
+
+---
+
+Phần dưới lưu kết quả **lần kiểm chứng ban đầu**. Địa chỉ và số liệu trong phần lịch sử không nhất thiết trùng deployment mới.
+
 Thời điểm chốt: 2026-10-20T20:27:22+07:00 (giờ Việt Nam). Kết quả từ **máy hiện tại**, Geth local chain **1337**, không phải Sepolia.
 
 ## Kết quả
@@ -53,7 +86,7 @@ Không coi receipt revert mong đợi là lỗi suite; không dùng eth_call tha
 Profit nêu trên **chưa trừ gas ETH** và đến từ chênh lệch reserves được chủ động seed cho bài học.
 Các giao dịch sau làm thay đổi reserves nên kết quả lần chạy sau sẽ khác.
 
-## Deployment đang chạy
+## Deployment trong lần kiểm chứng ban đầu
 
 | Thành phần | Địa chỉ local |
 |---|---|

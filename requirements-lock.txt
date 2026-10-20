@@ -43,3 +43,6 @@ urllib3==2.8.0
 web3==7.14.0
 websockets==15.0.1
 yarl==1.25.1
+# Windows-only runtime dependencies (not present in the original Linux freeze).
+colorama==0.4.6; sys_platform == "win32"
+pywin32==311; platform_system == "Windows"
